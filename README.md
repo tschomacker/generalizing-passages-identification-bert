@@ -6,7 +6,7 @@ This work is concerned with the automatic identification of generalizing passage
 In the following, we first establish a new state of the art for detecting generalizing passages in German fictional literature using a BERT model (Devlin et al., 2019). In a second step, we test whether the performance can be further improved by adding samples from a non-German corpus to the training data.
 
 We presented our results at the [KONVENS 2022](https://konvens2022.uni-potsdam.de/) Student Poster Session. If you are interested consider:
-- Reading our [extended abstract](https://github.com/tschomacker/generalizing-passages-identification-bert/blob/main/docs/abstract.pdf)
+- Reading our [extended abstract](https://zenodo.org/record/6979859)
 - Exploring our [conference poster](https://github.com/tschomacker/???)
 - Opening an [Issue](https://github.com/tschomacker/generalizing-passages-identification-bert/issues/new)
 - Reaching out to us directly
@@ -161,13 +161,19 @@ The Preprocessing creates the three data set csv-files: MONACO: `corpus-public.c
 
 
 ## Cite Us
-```python
-@Conference{schomacker:2022, 
-  author = {Thorben Schomacker and Tillmann Dönicke and Marina Tropmann-Frick}, 
-  title = {Automatic Identification of Generalizing Passages in German Fictional Texts using BERT with Monolingual and Multilingual Training Data}, 
-  booktitle = {KONVENS 2022 - Student Poster Session}, 
-  year = {2022}, 
-  month = {Sep.}, 
-  url = {https://github.com/tschomacker/hauptprojekt} 
-} 
+```
+
+@conference{schomackerAutomaticIdentificationGeneralizing2022,
+	title = {Automatic {Identification} of {Generalizing} {Passages} in {German} {Fictional} {Texts} using {BERT} with {Monolingual} and {Multilingual} {Training} {Data}},
+	author = {Schomacker, Thorben and Dönicke, Tillmann and Tropmann-Frick, Marina},
+	url = {https://zenodo.org/record/6979859},
+	doi = {10.5281/zenodo.6979859},
+	abstract = {Extended abstract submitted and accepted for the KONVENS 2022 Student Poster Session. The poster and code are available at https://github.com/tschomacker/generalizing-passages-identification-bert.},
+	language = {eng},
+	month = sep,
+	year = {2022},
+	copyright = {Creative Commons Attribution 4.0 International},
+	address = {Potsdam, Germany},
+}
+
 ```
