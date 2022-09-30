@@ -4,7 +4,8 @@ class Clause:
         self.POSSIBLE_TAGS = ['gi', 'comment', 'nfr']
         self.POSSIBLE_TAGS_SUBTAGS = {  'gi'        : ['ALL','BARE','DIV','EXIST','MEIST','NEG'], 
                                         'comment'   : ['Einstellung','Interpretation','Meta'], 
-                                        'nfr'       : ['Nichtfiktional','Nichtfiktional+mK']}
+                                        'nfr'       : ['Nichtfiktional','Nichtfiktional+mK'], 
+                                        'nfr_ex_mk'       : ['Nichtfiktional']}
         self.tokens = []
         self.contextualized_text = None
         self.clause_text_embed_in_passage = None
@@ -71,26 +72,80 @@ class Clause:
         """
         return one hot vector for gi subtags
         """
-        return self._tag_vector('gi')
+        return self._tag_vector('gi',False)
+
+    @property
+    def gi_none(self):
+        """
+        return one hot vector for gi subtags
+        """
+        return self._tag_vector('gi',True)
 
     @property
     def comment(self):
         """
         return one hot vector for comment subtags
         """
-        return self._tag_vector('comment')
+        return self._tag_vector('comment', False)
+
+    @property
+    def comment_none(self):
+        """
+        return one hot vector for comment subtags
+        """
+        return self._tag_vector('comment', True)
 
     @property
     def nfr(self):
         """
         return one hot vector for nfr subtags
         """
-        return self._tag_vector('nfr')
+        return self._tag_vector('nfr', False)
 
-
-    def _tag_vector(self, tag):
+    @property
+    def nfr_none(self):
         """
-        return: multi-hot vector for the subtags of the tag in string format
+        return one hot vector for nfr subtags
+        """
+        return self._tag_vector('nfr', True)
+
+    @property
+    def nfr_ex_mk(self):
+        """
+        Returns:
+            str: one hot vector for nfr subtags
+            but without the 'Nichtfiktional+mK' samples
+        """
+        return self._tag_vector('nfr_ex_mk', False)
+
+    @property
+    def generalization(self):
+        """
+        Returns:
+            str: 0 when no gi-subtag is applied; 1 when at least one gi-subtag is applied
+        """
+
+        # invert the none-label -> 
+        return str(1 if int(self._tag_vector('gi', True)[0]) == 0 else 0)
+
+    @property
+    def reflexive_ex_mk(self):
+        """
+        Returns:
+            str: 0 when no label is applied; 1 when at leat one label is applied
+        """
+        number_of_tags = (1 if int(self.comment_none[0]) == 0 else 0)+int(self.nfr_ex_mk)+int(self.generalization)
+        return str(1 if number_of_tags > 0 else 0)
+
+
+    def _tag_vector(self, tag, add_none_label):
+        """
+        Args:
+            tag (str) : tag-string
+            add_none_label (boolean): Flag that indicates whether the vector should start with
+            the none-label
+        Returns:
+            str: multi-hot vector for the subtags of the tag in string format
         """
         label = ''
         subtags = self.subtags
@@ -103,12 +158,13 @@ class Clause:
                 has_label = True
             else:
                 label += '0'
-        if has_label:
-            label = '0'+label
-        else:
-            label = '1'+label
-            if len(subtags) > 0:
-                self._tag_vector_sanity_check(subtags)
+        if add_none_label:
+            if has_label:
+                label = '0'+label
+            else:
+                label = '1'+label
+                if len(subtags) > 0:
+                    self._tag_vector_sanity_check(subtags)
         return label
     
     def _tag_vector_sanity_check(self,subtags):

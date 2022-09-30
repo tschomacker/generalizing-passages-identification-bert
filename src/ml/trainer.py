@@ -156,6 +156,9 @@ class Trainer():
         
         if not verbose:
             warnings.filterwarnings("ignore")
+                    
+        if model.output_features < 2 and exclude_none:
+            raise ValueError('exclude_none can only be True when no_labels > 1')
         
         model.eval()
         fin_targets=[]
@@ -212,7 +215,6 @@ class Trainer():
                 f1_unweighted = f1_score(y_true=clean_targets, y_pred=clean_outputs, average = None)
                 for label, f1_score_value in zip(labels, f1_unweighted):
                     results['F1-'+label] = f1_score_value
-                    
             results['F1-macro'] = f1_score(y_true=clean_targets, y_pred=clean_outputs, average = 'macro')
             results['F1-micro'] = f1_score(y_true=clean_targets, y_pred=clean_outputs, average = 'micro')
             return results

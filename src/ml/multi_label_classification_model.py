@@ -27,8 +27,8 @@ class MultiLabelClassificationModel(torch.nn.Module):
         ## large and base models differ in this point
         input_features = pretrained_configuration.hidden_size
         ## Output Features are the labels that should be predicted
-        output_features = number_of_labels
-        self.l2 = torch.nn.Linear(input_features, output_features)
+        self.output_features = number_of_labels
+        self.l2 = torch.nn.Linear(input_features, self.output_features)
         
         # Used to determine the underlying model; for logging results
         self.pre_trained_model = pre_trained_model

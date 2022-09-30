@@ -115,6 +115,8 @@ def create_data_dict(pretrained_model, path, task, tokenizer, max_len, corpus):
         keyword = 'generalization'
     elif 'multi' == task:
         keyword = 'gi'
+    else:
+        keyword = task
     
     if 'large' in pretrained_model:
         # large models take too much space on the gpu; change depending on hardware setup

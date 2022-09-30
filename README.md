@@ -7,7 +7,6 @@ In the following, we first establish a new state of the art for detecting genera
 
 We presented our results at the [KONVENS 2022](https://konvens2022.uni-potsdam.de/) Student Poster Session. If you are interested consider:
 - Reading our [extended abstract](https://zenodo.org/record/6979859)
-- Exploring our [conference poster](https://github.com/tschomacker/???)
 - Opening an [Issue](https://github.com/tschomacker/generalizing-passages-identification-bert/issues/new)
 - Reaching out to us directly
 
@@ -161,8 +160,8 @@ The Preprocessing creates the three data set csv-files: MONACO: `corpus-public.c
 
 
 ## Cite Us
-```
-
+License: [MIT License](LICENSE)
+```tex
 @conference{schomackerAutomaticIdentificationGeneralizing2022,
 	title = {Automatic {Identification} of {Generalizing} {Passages} in {German} {Fictional} {Texts} using {BERT} with {Monolingual} and {Multilingual} {Training} {Data}},
 	author = {Schomacker, Thorben and Dönicke, Tillmann and Tropmann-Frick, Marina},
@@ -175,5 +174,4 @@ The Preprocessing creates the three data set csv-files: MONACO: `corpus-public.c
 	copyright = {Creative Commons Attribution 4.0 International},
 	address = {Potsdam, Germany},
 }
-
 ```
