@@ -5,12 +5,12 @@ This work is concerned with the automatic identification of generalizing passage
 
 In the following, we first establish a new state of the art for detecting generalizing passages in German fictional literature using a BERT model (Devlin et al., 2019). In a second step, we test whether the performance can be further improved by adding samples from a non-German corpus to the training data.
 
-We presented our results at the [KONVENS 2022](https://konvens2022.uni-potsdam.de/) Student Poster Session. If you are interested consider:
+We presented our results at the [KONVENS 2022](https://konvens2022.uni-potsdam.de/?page_id=65#studi-poster-session) Student Poster Session. If you are interested consider:
 - Reading our [extended abstract](https://zenodo.org/record/6979859)
 - Opening an [Issue](https://github.com/tschomacker/generalizing-passages-identification-bert/issues/new)
 - Reaching out to us directly
 
-## :building_construction: Preprocessing
+## :building_construction: 1. Preprocessing
 We are using external data and preprocess them to make us of it:
 1. Download the [MONACO](https://gitlab.gwdg.de/mona/korpus-public)-data and save it in `data/korpus-public`
 1. Download the [SITENT](https://github.com/annefried/sitent/tree/master/annotated_corpus)-data and save it in `data/sitent`
@@ -19,11 +19,12 @@ We are using external data and preprocess them to make us of it:
 1. `cd preprocessing`
 1. run `python relabel_sitent.py` to create `sitent_gi_labels.json`
 1. run `python monaco_preprocessing.py` to create `corpus-public.csv`
+    - try `python monaco_preprocessing.py -h` in order to see the possibly arguments 
 1. run `python cage_preprocessing.py` to create `cage.csv` and `cage_small.csv`
 
 Please see Section [Sample format](#sample-format) for more information about the generated data. 
 
-## :test_tube: Experiments
+## :test_tube: 2. Experiments
 The data created in the previous step needs to be loaded into a DataLoader via a CustomDataset. Our experiments are based on a config-dictionary which includes all parameters. This dict is passed on to the Experiment-Class which executes experimental runs based on the config. Which can be plotted directly. Here is a minimal working example: Experiment configs look like this:
 
 see [examples/example_training.py](https://github.com/tschomacker/generalizing-passages-identification-bert/blob/main/src/examples/example_training.py)
@@ -75,10 +76,15 @@ example_model_test_results = trainer.test(example_model,
 print(example_model_test_results)
 ```
 
-## Download our models
+## :inbox_tray: 3. Download our models
+### 3.1. Konvens 2022 models
 You can download our [models](https://drive.google.com/drive/folders/119ViOQiT3mYdjBH-QLQ6HR_DCOlOa8nm?usp=sharing) (e.g., in `outpout\saved_models`) and load them.
 
-## XAI
+### 3.2. Reflexivity Classifiers
+We trained two separate classification models: 1) on **reflexive_ex_mk_binary** and 2) **reflexive_ex_mk_multi**. The correspondig script is [src/examples/example_reflexive_training.py](https://github.com/tschomacker/generalizing-passages-identification-bert/blob/main/src/examples/example_reflexive_training.py). To learn more about Reflexivity have a look at: 
+[Reflexive Passagen und ihre Attribution](https://zenodo.org/record/6328207).
+
+## :man_teacher: 4. XAI
 We encourage you to generate your own XAI Graphics with your own clauses or some samples from our dataset. Please download one of our models before.
 see: [examples/example_xai.py](https://github.com/tschomacker/generalizing-passages-identification-bert/blob/main/src/examples/example_xai.py)
 
@@ -141,7 +147,7 @@ for lime_clause in tqdm(lime_clause_list, desc='Generate XAI-Grpahic: clause(s)'
                           True)
 ```
 
-## Sample format
+## 5. Sample format
 The Preprocessing creates the three data set csv-files: MONACO: `corpus-public.csv`, CAGE `cage.csv` and CAGE-small `cage_small.csv`. Each one of them has the following columns:
 
 | **Column**                 | **Description**                                                                                                                | **Example** |
@@ -157,7 +163,8 @@ The Preprocessing creates the three data set csv-files: MONACO: `corpus-public.c
 | **category**               | SITENT-category, MONACO samples do not have a category                                                                         | essays             |
 | **dataset**                | train, validate, test                                                                                                          | train            |
 | **root_corpus**            | SITENT, MONACO                                                                                                                 | SITENT            |
-
+| **reflexive_ex_mk_binary** | 1 or 0, a flag that indicates whether the clause contains reflexivity                                                          | 0            |
+| **reflexive_ex_mk_multi**  | multi-hot vector for 'gi', 'comment', 'nfr_ex_mk'                                                                              | 010            |
 
 ## Cite Us
 License: [MIT License](LICENSE)

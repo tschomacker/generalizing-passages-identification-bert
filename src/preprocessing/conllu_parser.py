@@ -26,7 +26,7 @@ class ConlluParser:
         """
         documents = []
         i = 0
-        for conllu_file in tqdm(self._get_all_conllu_files(rootdir)):
+        for conllu_file in tqdm(self._get_all_conllu_files(rootdir), desc = 'Creating document(s) from conllu file(s)'):
             # start creating a document
             # 1. generate document id
             document_id = conllu_file.split('__')[0]

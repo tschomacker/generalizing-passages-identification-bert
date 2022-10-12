@@ -129,13 +129,23 @@ class Clause:
         return str(1 if int(self._tag_vector('gi', True)[0]) == 0 else 0)
 
     @property
-    def reflexive_ex_mk(self):
+    def reflexive_ex_mk_binary(self):
         """
         Returns:
             str: 0 when no label is applied; 1 when at leat one label is applied
         """
         number_of_tags = (1 if int(self.comment_none[0]) == 0 else 0)+int(self.nfr_ex_mk)+int(self.generalization)
         return str(1 if number_of_tags > 0 else 0)
+    
+    
+
+    @property
+    def reflexive_ex_mk_multi(self):
+        """
+        Returns:
+            str: one hot vector for 'gi'-'comment'-'nfr'
+        """
+        return self.generalization+str(1 if int(self.comment_none[0]) == 0 else 0)+self.nfr_ex_mk
 
 
     def _tag_vector(self, tag, add_none_label):
