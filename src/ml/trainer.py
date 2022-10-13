@@ -213,6 +213,8 @@ class Trainer():
             results = {}
             if labels is not None:
                 f1_unweighted = f1_score(y_true=clean_targets, y_pred=clean_outputs, average = None)
+                if len(labels) != len(f1_unweighted):
+                    warnings.warn('Mismatch: There are '+str(len(labels))+'and'+str(len(f1_unweighted))+'scores')
                 for label, f1_score_value in zip(labels, f1_unweighted):
                     results['F1-'+label] = f1_score_value
             results['F1-macro'] = f1_score(y_true=clean_targets, y_pred=clean_outputs, average = 'macro')

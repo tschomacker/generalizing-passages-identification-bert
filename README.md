@@ -1,4 +1,4 @@
-# Automatic Identification of Generalizing Passages in German Fictional Texts using BERT with Monolingual and Multilingual Training Data
+# <p align=center>Automatic Identification of Generalizing Passages in German Fictional Texts using BERT with Monolingual and Multilingual Training Data</p>
 by [@tschomacker](https://github.com/tschomacker), [@tidoe](https://github.com/tidoe) and [@marina-frick](https://github.com/marina-frick) 
 ## Introduction
 This work is concerned with the automatic identification of generalizing passages like *all ducks lay eggs or tigers are usually striped* (cf. Leslie and Lerner, 2016). In fictional texts, these passages often express some sort of (self-)reflection of a character or narrator or a universal truth which holds across the context of the fictional world (cf. Lahn and Meister, 2016, p. 184), and therefore they are of particular interest for narrative understanding in the computational literary studies.
@@ -81,8 +81,63 @@ print(example_model_test_results)
 You can download our [models](https://drive.google.com/drive/folders/119ViOQiT3mYdjBH-QLQ6HR_DCOlOa8nm?usp=sharing) (e.g., in `outpout\saved_models`) and load them.
 
 ### 3.2. Reflexivity Classifiers
+To create the dataset without Kleist run:
+```python
+python monaco_preprocessing.py \
+    --output ../../data/monaco-ex-kleist.csv \
+    --exclude Kleist
+```
 We trained two separate classification models: 1) on **reflexive_ex_mk_binary** and 2) **reflexive_ex_mk_multi**. The correspondig script is [src/examples/example_reflexive_training.py](https://github.com/tschomacker/generalizing-passages-identification-bert/blob/main/src/examples/example_reflexive_training.py). To learn more about Reflexivity have a look at: 
 [Reflexive Passagen und ihre Attribution](https://zenodo.org/record/6328207).
+
+## :medal_sports: 4. Results and Prediction
+### 4.1
+
+### 4.2 How to create a prediction
+```python
+import os
+import sys
+#sys.path.append(os.path.join(os.path.dirname(__file__),'../'))
+
+from xai.prediction_pipeline import PredictionPipeline
+from ml.model_util import spawn_model, load_model, create_data_dict
+
+from transformers import AutoTokenizer
+from torch import cuda
+
+
+PRETRAINED_MODEL_STR = "deepset/gbert-large"
+EVALUATION_TOKENIZER = AutoTokenizer.from_pretrained(PRETRAINED_MODEL_STR)
+labels = ['reflexive']
+
+device = 'cuda' if cuda.is_available() else 'cpu'
+fine_tuned_model = load_model(model_path = os.path.join('..','output','saved_models', 
+                                                        'reflexive_ex_mk_binary_gbert-large_monaco_epochs:20_lamb_0.0001_None_dh:0.3_da:0.0.pt'), 
+                              device = device, petrained_model_str = PRETRAINED_MODEL_STR, no_labels=len(labels))
+
+
+prediction_pipeline_t_l = PredictionPipeline(fine_tuned_model, EVALUATION_TOKENIZER, 206, device, labels)
+clause = "Aber wenn Leona auch eine vollkommen sachliche Auffassung der sexuellen Frage besaß , \
+        so hatte sie doch auch ihre Romantik . Nur hatte sich bei ihr alles Überschwengliche , Eitle , \
+        Verschwenderische , hatten sich die Gefühle des Stolzes , des Neides , der Wollust , des Ehrgeizes , \
+        der Hingabe, kurz die Triebkräfte der Persönlichkeit und des gesellschaftlichen Aufstiegs durch ein \
+        Naturspiel nicht mit dem sogenannten Herzen verbunden,<b> sondern mit dem tractus abdominalis , \
+        den Eßvorgängen,</b> mit denen sie übrigens in früheren Zeiten regelmäßig in Verbindung gestanden \
+        sind, was man noch heute an Primitiven oder an breit prassenden Bauern beobachten kann<b> , die \
+        Vornehmheit und allerhand anderes,</b> was den Menschen auszeichnet<b> , durch ein Festmahl auszudrücken \
+        vermögen,</b> bei dem man sich feierlich und mit allen Begleiterscheinungen überißt.An den Tischen ihres Tingeltangels tat Leona ihre Pflicht ;"
+prediction = [round(x) for x in prediction_pipeline_t_l.predict(clause)]
+print(prediction)
+```
+| Train | Test Data | Validate Data | Task | test F1-micro | test F1-macro |
+| --- | --- | --- | --- | --- | --- |
+| Monaco without Test, validate and Kleist | 'Wieland', 'Seghers' | 'Fontane','Mann' | reflexive_ex_mk_binary | 0.77 | 0.75 |
+
+| Task | F1-micro | F1-macro | F1-GI | F1-Comment | F1-NFR (excl. mk) | Train | Test Data | Validate Data | 
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| reflexive_ex_mk_binary | 0.77 | 0.75 | - | - | - | Monaco without Test, validate and Kleist | 'Wieland', 'Seghers' | 'Fontane','Mann' | 
+| reflexive_ex_mk_multi | 0.64 | 0.65 | 0.62 | 0.68 | 0.62 | Monaco without Test, validate and Kleist | 'Wieland', 'Seghers' | 'Fontane','Mann' | 
+Table 1: Test results (Truncated after second place after digit)
 
 ## :man_teacher: 4. XAI
 We encourage you to generate your own XAI Graphics with your own clauses or some samples from our dataset. Please download one of our models before.
