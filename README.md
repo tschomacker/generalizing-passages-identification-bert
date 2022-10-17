@@ -91,17 +91,23 @@ We trained two separate classification models: 1) on **reflexive_ex_mk_binary** 
 [Reflexive Passagen und ihre Attribution](https://zenodo.org/record/6328207).
 
 ## :medal_sports: 4. Results and Prediction
-### 4.1
+### 4.1 Results
+Besides the experiments in our paper, we additionally evaluated our approach on reflexity classification
+Table 1: Test results (Truncated after second place after digit)
+
+| Task | F1-micro | F1-macro | F1-GI | F1-Comment | F1-NFR (excl. mk) | Train | Test Data | Validate Data | 
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| reflexive_ex_mk_binary | 0.77 | 0.75 | - | - | - | Monaco without Test, validate and Kleist | 'Wieland', 'Seghers' | 'Fontane','Mann' | 
+| reflexive_ex_mk_multi | 0.64 | 0.65 | 0.62 | 0.68 | 0.62 | Monaco without Test, validate and Kleist | 'Wieland', 'Seghers' | 'Fontane','Mann' | 
 
 ### 4.2 How to create a prediction
+To make a predictiction, you can use the following script. The important attributes, that you could change to fit your needs, are: `labels` (Important that the length of this List matches the number of labels/output neurons of the model), `saved_model_path` (download a model as decribed earlier), and `clause` (basically every string is possible, longer strings will be concatenated and using `<b></b>`-tags is recommended)
 ```python
 import os
 import sys
 #sys.path.append(os.path.join(os.path.dirname(__file__),'../'))
-
 from xai.prediction_pipeline import PredictionPipeline
 from ml.model_util import spawn_model, load_model, create_data_dict
-
 from transformers import AutoTokenizer
 from torch import cuda
 
@@ -109,11 +115,12 @@ from torch import cuda
 PRETRAINED_MODEL_STR = "deepset/gbert-large"
 EVALUATION_TOKENIZER = AutoTokenizer.from_pretrained(PRETRAINED_MODEL_STR)
 labels = ['reflexive']
+saved_model_path = os.path.join('..','output','saved_models', 
+                                'reflexive_ex_mk_binary_gbert-large_monaco_epochs:20_lamb_0.0001_None_dh:0.3_da:0.0.pt')
 
 device = 'cuda' if cuda.is_available() else 'cpu'
-fine_tuned_model = load_model(model_path = os.path.join('..','output','saved_models', 
-                                                        'reflexive_ex_mk_binary_gbert-large_monaco_epochs:20_lamb_0.0001_None_dh:0.3_da:0.0.pt'), 
-                              device = device, petrained_model_str = PRETRAINED_MODEL_STR, no_labels=len(labels))
+fine_tuned_model = load_model(model_path = saved_model_path, device = device, 
+                              petrained_model_str = PRETRAINED_MODEL_STR, no_labels=len(labels))
 
 
 prediction_pipeline_t_l = PredictionPipeline(fine_tuned_model, EVALUATION_TOKENIZER, 206, device, labels)
@@ -129,17 +136,9 @@ clause = "Aber wenn Leona auch eine vollkommen sachliche Auffassung der sexuelle
 prediction = [round(x) for x in prediction_pipeline_t_l.predict(clause)]
 print(prediction)
 ```
-| Train | Test Data | Validate Data | Task | test F1-micro | test F1-macro |
-| --- | --- | --- | --- | --- | --- |
-| Monaco without Test, validate and Kleist | 'Wieland', 'Seghers' | 'Fontane','Mann' | reflexive_ex_mk_binary | 0.77 | 0.75 |
 
-| Task | F1-micro | F1-macro | F1-GI | F1-Comment | F1-NFR (excl. mk) | Train | Test Data | Validate Data | 
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| reflexive_ex_mk_binary | 0.77 | 0.75 | - | - | - | Monaco without Test, validate and Kleist | 'Wieland', 'Seghers' | 'Fontane','Mann' | 
-| reflexive_ex_mk_multi | 0.64 | 0.65 | 0.62 | 0.68 | 0.62 | Monaco without Test, validate and Kleist | 'Wieland', 'Seghers' | 'Fontane','Mann' | 
-Table 1: Test results (Truncated after second place after digit)
 
-## :man_teacher: 4. XAI
+## :man_teacher: 5. XAI
 We encourage you to generate your own XAI Graphics with your own clauses or some samples from our dataset. Please download one of our models before.
 see: [examples/example_xai.py](https://github.com/tschomacker/generalizing-passages-identification-bert/blob/main/src/examples/example_xai.py)
 
@@ -187,7 +186,7 @@ gi_explainer = LimeTextExplainer(class_names=gi_multi_labels, feature_selection=
 # ATTENTION: Keep in mind, that the number_of_samples highly effects the time it takes to generate a graphic
 # So please be patient, when choosing values beyond 5000
 # We strongly discourage you from using CPU. 
-# It really slows down the whole process. One Graphic can up to 30 minutes to generate
+# It really slows down the whole process. One Graphic can up to 30 minutes to generate on cpu
 number_of_samples = 5 # default: 5000
 coverage_samples = 10 # default: 10000
 for lime_clause in tqdm(lime_clause_list, desc='Generate XAI-Grpahic: clause(s)'): 
