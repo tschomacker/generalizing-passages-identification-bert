@@ -152,7 +152,7 @@ PRETRAINED_MODEL_STR = "deepset/gbert-large"
 EVALUATION_TOKENIZER = AutoTokenizer.from_pretrained(PRETRAINED_MODEL_STR)
 labels = ['reflexive']
 saved_model_path = os.path.join('..','output','saved_models', 
-                                'reflexive_ex_mk_binary_gbert-large_monaco_epochs:20_lamb_0.0001_None_dh:0.3_da:0.0.pt')
+                                'reflexive_ex_mk_binary_gbert-large_monaco-ex-kleist_epochs_20_lamb_0.0001_None_dh_0.3_da_0.0.pt')
 
 device = 'cuda' if cuda.is_available() else 'cpu'
 fine_tuned_model = load_model(model_path = saved_model_path, device = device, 

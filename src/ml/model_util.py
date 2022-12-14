@@ -103,7 +103,7 @@ def load_model(model_path, device, petrained_model_str, no_labels):
     #except RuntimeError: 
         # 'Attempting to deserialize object on a CUDA '
     #    print('loading a cuda model on the CPU')
-    trained_model.load_state_dict(torch.load(model_path, map_location=torch.device(device)))
+    trained_model.load_state_dict(torch.load(model_path, map_location=torch.device(device)), strict=False)
     trained_model.to(device)
     return trained_model
 
