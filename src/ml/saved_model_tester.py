@@ -35,7 +35,7 @@ if __name__ == "__main__":
                 exclude_none = True
                 labels.remove('none')
             else:
-                exlude_none = False
+                exclude_none = False
 
             trainer = Trainer()
             example_data_dict = create_data_dict(PRETRAINED_MODEL_STR, args.data, keyword, EVALUATION_TOKENIZER, 206, 'monaco')

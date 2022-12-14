@@ -80,6 +80,13 @@ print(example_model_test_results)
 ### 3.1. Konvens 2022 models
 You can download our [models](https://github.com/tschomacker/generalizing-passages-identification-bert/releases/tag/v0.3.0) (e.g., in `outpout\saved_models`) and load them.
 
+For separating Monaco v3.0
+```python
+python monaco_preprocessing.py \
+    --input ../../data/korpus-public-v30 \
+    --output ../../data/monaco-v30.csv
+```
+
 ### 3.2. Reflexivity Classifiers
 To create the dataset without Kleist run:
 ```python
@@ -97,9 +104,12 @@ Table 1: Test results (Truncated after second place after digit)
 
 | Task | F1-binary | F1-micro | F1-macro | F1-GI | F1-Comment | F1-NFR (excl. mk) | Train | Validate Data | Test Data |  
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| generalization | 0.62 | - | - | 0.62 | - | - | Monaco 3.0 without Test, validate and Kleist | 'Fontane', 'Mann' (Monaco 3.0) | 'Wieland', 'Seghers' (Monaco 4.1) | 
+| generalization | **0.62** | - | - | 0.62 | - | - | Monaco 3.0 without Test, validate | 'Fontane', 'Mann' (Monaco 3.0) | 'Wieland', 'Seghers' (Monaco **4.1**) | 
+| generalization | **0.62** | - | - | 0.62 | - | - | Monaco 3.0 without Test, validate | 'Fontane', 'Mann' (Monaco 3.0) | 'Wieland', 'Seghers' (Monaco **3.0**) | 
+| generalization | 0.60 | - | - | 0.60 | - | - | CAGE (incl. Monaco 3.0 without Test, validate) | 'Fontane', 'Mann' (Monaco 3.0) | 'Wieland', 'Seghers' (Monaco **3.0**) | 
+| generalization | 0.59 | - | - | 0.59 | - | - | CAGE-small (incl. Monaco 3.0 without Test, validate) | 'Fontane', 'Mann' (Monaco 3.0) | 'Wieland', 'Seghers' (Monaco **3.0**) |
 | reflexive_ex_mk_binary | 0.69 | - | - | - | - | - | Monaco 4.1 without Test, validate and Kleist | 'Fontane', 'Mann' (Monaco 4.1) | 'Wieland', 'Seghers' (Monaco 4.1) | 
-| reflexive_ex_mk_multi | - | 0.64 | 0.65 | 0.62 | 0.68 | 0.62 | Monaco 4.1 without Test, validate and Kleist |'Fontane','Mann' (Monaco 4.1) | 'Wieland', 'Seghers' (Monaco 4.1) |  
+| reflexive_ex_mk_multi | - | 0.64 | 0.65 | **0.62** | 0.68 | 0.62 | Monaco 4.1 without Test, validate and Kleist |'Fontane','Mann' (Monaco 4.1) | 'Wieland', 'Seghers' (Monaco 4.1) |  
 
 ### 4.2 Re-Create the results
 To quickly re-create our results, download the model and run: 
@@ -112,9 +122,27 @@ python -m ml.test_util --test ../output/saved_models/reflexive_ex_mk_binary_gber
 ```
 
 #### 4.2.2 generalization (binary)
+Train: MONACO 3.0; Test: MONACO 3.0
 ```python
-python -m ml.test_util --test ../output/saved_models/binary_gbert-large_monaco_epochs_20_lamb_0.0001_None_dh_0.3_da_0.0.pt --data ../data/korpus-public.csv --labels generalization
+python -m ml.saved_model_tester --test ../output/saved_models/binary_gbert-large_monaco_epochs_20_lamb_0.0001_None_dh_0.3_da_0.0.pt \
+--data ../data/monaco-v30.csv --labels generalization
 ```
+Train: MONACO 3.0; Test: MONACO 4.1
+```python
+python -m ml.saved_model_tester --test ../output/saved_models/binary_gbert-large_monaco_epochs_20_lamb_0.0001_None_dh_0.3_da_0.0.pt \
+--data ../data/korpus-public.csv --labels generalization
+```
+Train: Cage; Test: MONACO 3.0 
+```python
+python -m ml.saved_model_tester --test ../output/saved_models/binary_gbert-large_cage_epochs:20_lamb_0.0001_None_dh:0.3_da:0.0.pt \
+--data ../data/monaco-v30.csv --labels generalization
+```
+Train: Cage-small; Test: MONACO 3.0 
+```python
+python -m ml.saved_model_tester --test ../output/saved_models/binary_gbert-large_cage_small_epochs:20_lamb_0.0001_None_dh:0.3_da:0.0.pt \
+--data ../data/monaco-v30.csv --labels generalization
+```
+
 #### 4.2.2
 ```python
 python -m ml.saved_model_tester \
@@ -129,6 +157,15 @@ python -m ml.saved_model_tester \
 python -m ml.saved_model_tester \
 --test ../output/saved_models/multi_gbert-large_monaco_epochs:20_lamb_0.0001_None_dh:0.3_da:0.0.pt \
 --data ../data/korpus-public.csv \
+--labels none ALL BARE DIV EXIST MEIST NEG \
+--keyword gi_none
+```
+
+
+```python
+python -m ml.saved_model_tester \
+--test ../output/saved_models/multi_gbert-large_monaco_epochs:20_lamb_0.0001_None_dh:0.3_da:0.0.pt \
+--data ../data/monaco-v30.csv \
 --labels none ALL BARE DIV EXIST MEIST NEG \
 --keyword gi_none
 ```

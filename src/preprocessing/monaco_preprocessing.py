@@ -69,6 +69,7 @@ def main(input_path, output_path, test_document_ids, validate_document_ids,exclu
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Preprocessing MONACO by parsing conllu files and applying a train, validate, test split')
+    parser.add_argument('--input', type=str, default=None, help="Path of the input directoy.")
     parser.add_argument('--output', type=str, default='../../data/korpus-public.csv', help="Path of the output file.")
     parser.add_argument('--test', nargs='+', default=['Wieland', 'Seghers'], help="ID(s) of the document(s) in the TEST dataset")
     parser.add_argument('--validate', nargs='+', default=['Fontane','Mann'], help="ID(s) of the document(s) in the VALIDATE dataset")
