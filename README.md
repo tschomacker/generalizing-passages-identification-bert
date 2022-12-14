@@ -78,7 +78,7 @@ print(example_model_test_results)
 
 ## :inbox_tray: 3. Download our models
 ### 3.1. Konvens 2022 models
-You can download our [models](https://drive.google.com/drive/folders/119ViOQiT3mYdjBH-QLQ6HR_DCOlOa8nm?usp=sharing) (e.g., in `outpout\saved_models`) and load them.
+You can download our [models](https://github.com/tschomacker/generalizing-passages-identification-bert/releases/tag/v0.3.0) (e.g., in `outpout\saved_models`) and load them.
 
 ### 3.2. Reflexivity Classifiers
 To create the dataset without Kleist run:
@@ -92,15 +92,51 @@ We trained two separate classification models: 1) on **reflexive_ex_mk_binary** 
 
 ## :medal_sports: 4. Results and Prediction
 ### 4.1 Results
-Besides the experiments in our paper, we additionally evaluated our approach on reflexity classification
+Besides the experiments in our paper, we additionally evaluated our approach on reflexity classification. The task column is equivalent to the attribute we used from the Table in Section 5.
 Table 1: Test results (Truncated after second place after digit)
 
-| Task | F1-micro | F1-macro | F1-GI | F1-Comment | F1-NFR (excl. mk) | Train | Test Data | Validate Data | 
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| reflexive_ex_mk_binary | 0.77 | 0.75 | - | - | - | Monaco without Test, validate and Kleist | 'Wieland', 'Seghers' | 'Fontane','Mann' | 
-| reflexive_ex_mk_multi | 0.64 | 0.65 | 0.62 | 0.68 | 0.62 | Monaco without Test, validate and Kleist | 'Wieland', 'Seghers' | 'Fontane','Mann' | 
+| Task | F1-binary | F1-micro | F1-macro | F1-GI | F1-Comment | F1-NFR (excl. mk) | Train | Validate Data | Test Data |  
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| generalization | 0.62 | - | - | 0.62 | - | - | Monaco 3.0 without Test, validate and Kleist | 'Fontane', 'Mann' (Monaco 3.0) | 'Wieland', 'Seghers' (Monaco 4.1) | 
+| reflexive_ex_mk_binary | 0.69 | - | - | - | - | - | Monaco 4.1 without Test, validate and Kleist | 'Fontane', 'Mann' (Monaco 4.1) | 'Wieland', 'Seghers' (Monaco 4.1) | 
+| reflexive_ex_mk_multi | - | 0.64 | 0.65 | 0.62 | 0.68 | 0.62 | Monaco 4.1 without Test, validate and Kleist |'Fontane','Mann' (Monaco 4.1) | 'Wieland', 'Seghers' (Monaco 4.1) |  
 
-### 4.2 How to create a prediction
+### 4.2 Re-Create the results
+To quickly re-create our results, download the model and run: 
+```
+cd src
+```
+#### 4.2.1 reflexive_ex_mk_binary
+```python
+python -m ml.test_util --test ../output/saved_models/reflexive_ex_mk_binary_gbert-large_monaco-ex-kleist_epochs:20_lamb_0.0001_None_dh:0.3_da:0.0.pt --data ../data/monaco-ex-kleist.csv --labels reflexive_ex_mk_binary
+```
+
+#### 4.2.2 generalization (binary)
+```python
+python -m ml.test_util --test ../output/saved_models/binary_gbert-large_monaco_epochs_20_lamb_0.0001_None_dh_0.3_da_0.0.pt --data ../data/korpus-public.csv --labels generalization
+```
+#### 4.2.2
+```python
+python -m ml.saved_model_tester \
+--test ../output/saved_models/reflexive_ex_mk_multi_gbert-large_monaco-ex-kleist_epochs:20_lamb_0.0001_None_dh:0.3_da:0.0.pt \
+--data ../data/monaco-ex-kleist.csv \
+--labels gi comment nfr  \
+--keyword reflexive_ex_mk_multi
+```
+
+#### 4.2.2 GI (multi)
+```python
+python -m ml.saved_model_tester \
+--test ../output/saved_models/multi_gbert-large_monaco_epochs:20_lamb_0.0001_None_dh:0.3_da:0.0.pt \
+--data ../data/korpus-public.csv \
+--labels none ALL BARE DIV EXIST MEIST NEG \
+--keyword gi_none
+```
+
+
+
+
+### 4.3 How to create a prediction
 To make a predictiction, you can use the following script. The important attributes, that you could change to fit your needs, are: `labels` (Important that the length of this List matches the number of labels/output neurons of the model), `saved_model_path` (download a model as decribed earlier), and `clause` (basically every string is possible, longer strings will be concatenated and using `<b></b>`-tags is recommended)
 ```python
 import os
@@ -219,6 +255,8 @@ The Preprocessing creates the three data set csv-files: MONACO: `corpus-public.c
 | **root_corpus**            | SITENT, MONACO                                                                                                                 | SITENT            |
 | **reflexive_ex_mk_binary** | 1 or 0, a flag that indicates whether the clause contains reflexivity                                                          | 0            |
 | **reflexive_ex_mk_multi**  | multi-hot vector for 'gi', 'comment', 'nfr_ex_mk'                                                                              | 010            |
+
+During the pre-processsing one document is split into multiple passage, and each passage into multiple clauses. The attributes of the tables are mostly equivvalent with the attributes defined in the clause-class: [src/preprocessing/models/clause.py](https://github.com/tschomacker/generalizing-passages-identification-bert/blob/main/src/preprocessing/models/clause.py)
 
 ## Cite Us
 License: [MIT License](LICENSE)

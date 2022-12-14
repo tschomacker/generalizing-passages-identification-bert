@@ -128,6 +128,8 @@ def create_data_dict(pretrained_model, path, task, tokenizer, max_len, corpus):
                           'num_workers': 0}
     
     train_set, test_set, validation_set = CustomDataset.from_csv(keyword, tokenizer, max_len,  path, 'contextualized_clause')
+    if len(train_set) < 1:
+        print(keyword, 'does not seem to be a valid keyword')
     return {'batch_size': data_loader_params['batch_size'], 'pretrained' : pretrained_model,'task' : task, 'corpus' : corpus, 
             'train': DataLoader(train_set, **data_loader_params), 
             'validate': DataLoader(validation_set, **data_loader_params), 'test' : DataLoader(test_set, **data_loader_params)}

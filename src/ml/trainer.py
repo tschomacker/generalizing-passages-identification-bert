@@ -4,7 +4,7 @@ import warnings
 from tqdm.auto import tqdm
 from ml.lamb import Lamb
 from ml.early_stopping import EarlyStopping
-from sklearn.metrics import f1_score
+from sklearn import metrics
 
 
 class Trainer():
@@ -158,8 +158,8 @@ class Trainer():
             warnings.filterwarnings("ignore")
                     
         if model.output_features < 2 and exclude_none:
-            raise ValueError('exclude_none can only be True when no_labels > 1')
-        
+            #raise ValueError('exclude_none can only be True when no_labels > 1')
+            pass
         model.eval()
         fin_targets=[]
         fin_outputs=[]
@@ -209,14 +209,29 @@ class Trainer():
                 clean_targets = targets
                 clean_outputs = outputs
             #metrics_dict = ml.multi_label_evaluation.apply_metrics(targets, outputs)
+                    
             
             results = {}
             if labels is not None:
-                f1_unweighted = f1_score(y_true=clean_targets, y_pred=clean_outputs, average = None)
-                if len(labels) != len(f1_unweighted):
-                    warnings.warn('Mismatch: There are '+str(len(labels))+'and'+str(len(f1_unweighted))+'scores')
-                for label, f1_score_value in zip(labels, f1_unweighted):
-                    results['F1-'+label] = f1_score_value
-            results['F1-macro'] = f1_score(y_true=clean_targets, y_pred=clean_outputs, average = 'macro')
-            results['F1-micro'] = f1_score(y_true=clean_targets, y_pred=clean_outputs, average = 'micro')
+                f1_unweighted = metrics.f1_score(y_true=clean_targets, y_pred=clean_outputs, average = None)
+                if 1==len(labels):
+                    #binary_targets = [num for elem in clean_targets for num in elem]
+                    #binary_outputs = [num for elem in clean_outputs for num in elem]
+                    
+                    results['F1-binary'] = metrics.f1_score(y_true=clean_targets, y_pred=clean_outputs, average = 'binary', pos_label=1.0)
+            
+                    #print('f1_unweighted',f1_unweighted,
+                    #      '\nf1_macro_labels_0', metrics.f1_score(y_true=clean_targets, y_pred=clean_outputs, average = 'macro', labels=[0.0]),
+                    #  '\nf1_macro_labels_1', metrics.f1_score(y_true=clean_targets, y_pred=clean_outputs, average = 'macro', labels=[1.0]))
+                elif len(labels) != len(f1_unweighted):
+                    #warnings.warn('Mismatch: There are '+str(len(labels))+'and'+str(len(f1_unweighted))+'scores')
+                    raise ValueError('Mismatch: There are '+str(len(labels))+' labels and '+str(len(f1_unweighted))+' scores')
+                else:
+                    for label, f1_score_value in zip(labels, f1_unweighted):
+                        results['F1-'+label] = f1_score_value
+            
+            results['F1-unweighted'] = f1_unweighted.tolist()
+            results['F1-macro'] = metrics.f1_score(y_true=clean_targets, y_pred=clean_outputs, average = 'macro')
+            results['F1-micro'] = metrics.f1_score(y_true=clean_targets, y_pred=clean_outputs, average = 'micro')
             return results
+    

@@ -69,7 +69,6 @@ class CustomDataset(Dataset):
         # convert the label string to list of ints
         df['labels'] = korpus_df[tag].apply(lambda labels_string: [int(label_char) for label_char in labels_string])
         
-        
         train = df[df.dataset == 'train']
         test = df[df.dataset == 'test']
         validate = df[df.dataset == 'validate']
